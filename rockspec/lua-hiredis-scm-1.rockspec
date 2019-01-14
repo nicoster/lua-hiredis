@@ -33,7 +33,8 @@ build = {
             -- bundled hiredis code --
             "lib/",
             "lib/hiredis/"
-         }
+         },
+         defines = {"LUAROCKS_HACK -g" },
       }
    }
 }

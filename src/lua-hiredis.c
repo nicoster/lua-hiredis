@@ -433,6 +433,8 @@ static const luaL_Reg M[] =
 
 static int lhiredis_connect(lua_State * L)
 {
+  printf("in connect\n");
+
   luahiredis_Connection * pResult = NULL;
   redisContext * pContext = NULL;
 
@@ -456,6 +458,7 @@ static int lhiredis_connect(lua_State * L)
     return 2;
   }
 
+
   if (pContext->err)
   {
     int result = push_error(L, pContext);
@@ -471,6 +474,8 @@ static int lhiredis_connect(lua_State * L)
       L, sizeof(luahiredis_Connection)
     );
   pResult->pContext = pContext;
+
+  printf("conn: %p, ctx: %p\n", pResult, pContext);
 
   if (luaL_newmetatable(L, LUAHIREDIS_CONN_MT))
   {

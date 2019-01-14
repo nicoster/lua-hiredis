@@ -1087,6 +1087,8 @@ int redisBufferRead(redisContext *c) {
         __redisSetError(c,REDIS_ERR_EOF,"Server closed the connection");
         return REDIS_ERR;
     } else {
+
+        printf("------ %d\n%s------\n", nread, buf);
         if (redisReaderFeed(c->reader,buf,nread) != REDIS_OK) {
             __redisSetError(c,c->reader->err,c->reader->errstr);
             return REDIS_ERR;
@@ -1095,6 +1097,11 @@ int redisBufferRead(redisContext *c) {
     return REDIS_OK;
 }
 
+size_t mywrite(int fd, const void *buf, size_t nbyte) {
+    int nwritten = write(fd, buf, nbyte);
+    printf("------ %d/%d\n%s------\n", nwritten, nbyte, buf);
+    return nwritten; 
+}
 /* Write the output buffer to the socket.
  *
  * Returns REDIS_OK when the buffer is empty, or (a part of) the buffer was
@@ -1112,7 +1119,8 @@ int redisBufferWrite(redisContext *c, int *done) {
         return REDIS_ERR;
 
     if (sdslen(c->obuf) > 0) {
-        nwritten = write(c->fd,c->obuf,sdslen(c->obuf));
+        nwritten = mywrite(c->fd,c->obuf,sdslen(c->obuf));
+        // printf("fd:%d write %d/%d %s\n", c->fd, nwritten, sdslen(c->obuf), c->obuf);
         if (nwritten == -1) {
             if (errno == EAGAIN && !(c->flags & REDIS_BLOCK)) {
                 /* Try again later */
